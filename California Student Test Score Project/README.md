@@ -10,7 +10,7 @@ This is then clean and processed to CSV and txt for further analysis.
 
 - [ ] Plot Graphs
 
-      - [ ] QQ Plots
+      [X] QQ Plots
 
       - [ ] Residual and linear fitted model
       
