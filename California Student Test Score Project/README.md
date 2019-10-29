@@ -8,7 +8,11 @@ The code automatically regresses using the NVMAX(), and utilizes BIC()[x,] to fi
 This is then clean and processed to CSV and txt for further analysis. 
 
 To Do:
+
 -[ ] Plot Graphs
-[ ] QQ Plots
+
+-[ ] QQ Plots
+
 -[ ] residual and linear fitted model
+
 -[ ]
