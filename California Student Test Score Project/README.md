@@ -1,4 +1,5 @@
-Note: This project is on going, and will be periodically updated. 
+# California Student Test Score Project
+## Note: This project is on going, and will be periodically updated. 
 
 
 This project aims to create and model (both linear and quadratic models) various factors that affect California student's test scores using the regsubset() function.
@@ -7,12 +8,12 @@ The code automatically regresses using the NVMAX(), and utilizes BIC()[x,] to fi
 
 This is then clean and processed to CSV and txt for further analysis. 
 
-To Do:
+## To Do:
 
--[ ] Plot Graphs
+- [ ] Plot Graphs
 
--[ ] QQ Plots
+- [ ] QQ Plots
 
--[ ] residual and linear fitted model
+- [ ] residual and linear fitted model
 
--[ ]
+- [ ] 
