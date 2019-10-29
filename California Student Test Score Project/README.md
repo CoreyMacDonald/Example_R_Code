@@ -15,9 +15,10 @@ This is then clean and processed to CSV and txt for further analysis.
 - [ ] Residual and linear fitted model
 
 - [ ] Heteroskedacity
---[ ]JBG Test, White Test
 
-- [ ] 
+      - [ ] JBG Test
+      - [ ] White Test
+
 
 
 ### Note: This project is on going, and will be periodically updated. 
