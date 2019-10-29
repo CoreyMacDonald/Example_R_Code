@@ -10,14 +10,18 @@ This is then clean and processed to CSV and txt for further analysis.
 
 - [ ] Plot Graphs
 
-- [ ] QQ Plots
+      - [ ] QQ Plots
 
-- [ ] Residual and linear fitted model
+      - [ ] Residual and linear fitted model
+      
+      - [ ] Normality, Leave-one-Out
+
 
 - [ ] Heteroskedacity
 
       - [ ] JBG Test
       - [ ] White Test
+      
 
 
 
