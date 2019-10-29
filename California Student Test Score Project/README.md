@@ -11,9 +11,7 @@ This is then clean and processed to CSV and txt for further analysis.
 - [ ] Plot Graphs
 
       [X] QQ Plots
-
       [ ] Residual and linear fitted model
-      
       [ ] Normality, Leave-one-Out
 
 
