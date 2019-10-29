@@ -1,6 +1,4 @@
 # California Student Test Score Project
-## Note: This project is on going, and will be periodically updated. 
-
 
 This project aims to create and model (both linear and quadratic models) various factors that affect California student's test scores using the regsubset() function.
 
@@ -17,3 +15,6 @@ This is then clean and processed to CSV and txt for further analysis.
 - [ ] residual and linear fitted model
 
 - [ ] 
+
+
+### Note: This project is on going, and will be periodically updated. 
