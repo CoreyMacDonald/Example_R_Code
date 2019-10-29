@@ -12,7 +12,10 @@ This is then clean and processed to CSV and txt for further analysis.
 
 - [ ] QQ Plots
 
-- [ ] residual and linear fitted model
+- [ ] Residual and linear fitted model
+
+- [ ] Heteroskedacity
+--[ ]JBG Test, White Test
 
 - [ ] 
 
