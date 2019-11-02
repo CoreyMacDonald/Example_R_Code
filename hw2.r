@@ -60,15 +60,15 @@ Modloess <- loess(Ratio~Test_Score)
 ######## Initial Scatter Plot ######
 ScatterPlot <- ggplot(TestData, aes(x = Ratio, y = Test_Score))
 
-ScatterPlot +   
+ScatterPlot +
   ggtitle("Figure 1.  Scatterplot of Test Scores v. Student to Teacher Ratio") +
-  
+
   xlab("Student  - Teacher Ratio") +
   ylab("Student's Reading Scores (%)") +
   ylim(min(75),M=max(90)) +
   xlim(min(Ratio),M=max(Ratio))  +
-  
-  
+
+
   #Standard lm Regression, blue line
   geom_point(aes(x = Ratio,y = Test_Score))
 
@@ -135,14 +135,14 @@ LinReg_all_16 <- regsubsets(
 LinReg_all_512 <- regsubsets(
   read_scr ~ ., data = no_math_data, nbest=1,
   nvmax = 512, really.big= TRUE ,
-  method=c("exhaustive")) 
+  method=c("exhaustive"))
 
 
 #Best with only squared terms -- BIC = 1240.612
-LinReg_Best_Squared <- lm(read_scr ~ meal_pct + `expn_stu * expn_stu` + avginc + el_pct , data=no_math_data) 
+LinReg_Best_Squared <- lm(read_scr ~ meal_pct + `expn_stu * expn_stu` + avginc + el_pct , data=no_math_data)
 
 #Best Model (I think) -- BIC = 1239.756
-lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data) 
+lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 
 
 #Best with all interactions, but nvmax = 512 -- BIC = 1239.756
@@ -264,7 +264,7 @@ jarque.bera.test(resid_lm)
 
 #Scatterplot the residuals
 plot(resid_lm, main = "Residual Plot from Best Regression",
-     xlab = "fitted Y values", 
+     xlab = "fitted Y values",
      ylab = "Deviation")
 
 #LAD with all interactions, but nvmax = 512 -- BIC = 1245.196
@@ -276,7 +276,7 @@ jarque.bera.test(resid_lm)
 
 #Scatterplot the LAD residuals
 plot(resid_lm, main = "Residual Plot from Best Regression LAD",
-     xlab = "fitted Y values", 
+     xlab = "fitted Y values",
      ylab = "Deviation")
 
 ###### Detecting Heteroskadicity #####
@@ -306,3 +306,69 @@ print(Reject)
 #We do reject the Null at the 5% significance Level
 
 
+################################################################################
+############################ MATH REGRESSIONS ##################################
+################################################################################
+
+#Import data again
+TestData<-read.csv("CATestScoreData.csv",header=TRUE)
+
+#Regression of math_scr on str
+basic_model <- lm(math_scr~Test_Score, data = TestData)
+summary(basic_model)
+
+
+#Finding the best linear Model
+no_read_data <-TestData
+no_read_data$testscr <- NULL
+no_read_data$X <- NULL
+no_read_data$X.1 <- NULL
+no_read_data$read_scr <- NULL
+size = ncol(no_read_data)
+
+#NVMAX = 16
+LinReg_all_16 <- regsubsets(
+  math_scr ~ ., data = no_read_data,
+  nvmax = 16, really.big= TRUE ,
+  method=c("exhaustive"))
+
+summary(LinReg_all_16)
+which.min(summary(LinReg_all_16)$bic)
+#Best Linear Model (I think) -- BIC = 1258.1
+lmNVMAX16 <- lm(read_scr~ meal_pct + avginc + el_pct, data=no_math_data)
+BIC(lmNVMAX16)
+
+#Finding best non-linear model
+no_read_data <-TestData
+no_read_data$math_scr <- NULL
+no_read_data$testscr <- NULL
+no_read_data$X <- NULL
+no_read_data$X.1 <- NULL
+no_read_data$read_scr <- NULL
+size = ncol(no_read_data)
+
+for (x in 1:size) {
+  y = x
+  while (y <= size) {
+    new_name <- paste(colnames(no_read_data)[x], "*", colnames(no_read_data)[y])
+    no_read_data$bullshit = no_read_data[,x] * no_read_data[,y]
+    names(no_read_data)[names(no_read_data) == "bullshit"] <- new_name
+    y = y + 1
+    #print(head(no_read_data, n=1L))
+  }
+}
+head(no_read_data)
+no_read_data$math_scr <- TestData$math_scr
+
+#NVMAX = 16
+NonLinReg_all_16 <- regsubsets(
+  math_scr ~ ., data = no_read_data,
+  nvmax = 16, really.big= TRUE ,
+  method=c("exhaustive"))
+
+summary(NonLinReg_all_16)
+which.min(summary(NonLinReg_all_16)$bic)
+
+#Best Non-linear Model (I think) -- BIC = 1245.453
+nlmNVMAX16 <- lm(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
+BIC(nlmNVMAX16)
