@@ -13,8 +13,6 @@ library(ggforce)
 library(dplyr)
 library(car)
 library(lmtest)
-library(car)
-library(lmtest)
 library(sandwhich)
 library(lmSubsets)
 library(leaps)
@@ -32,23 +30,16 @@ rm(list = ls())
 
 TestData<-read.csv("CATestScoreData.csv",header=TRUE)
 
-Test_Score <- TestData$read_scr
-
-Ratio <- TestData$str
-ScatterPlot <- ggplot(TestData, aes(x = Ratio, y = Test_Score))
-# Initialize Models
-# ""BEST MODEL""
-
-#linreg <- lm( )
 
 #Simple Regression Model
-Modlm <- lm(Test_Score~Ratio)
+Modlm <- lm(read_scr~str, data= no_math_data)
 summary(Modlm)
 
 #Simple Regression on only the Intercept
-lm_onIntersept <- lm(Test_Score~1)
+lm_onIntersept <- lm(read_scr~1, data = no_math_data)
 
 #regression without intercept
+<<<<<<< HEAD
 regression_without_intercept <- lm(Test_Score~Ratio- 1)
 
 #Loess Model (Not Used)
@@ -98,7 +89,11 @@ ScatterPlot +
 
 
 TestData<-read.csv("CATestScoreData.csv",header=TRUE)
+=======
+regression_without_intercept <- lm(read_scr~str- 1, data = no_math_data)
+>>>>>>> ac25b14bef40930762c92a7f9086e502ab551d2a
 
+#Creates needed Dataset
 no_math_data <-TestData
 no_math_data$math_scr <- NULL
 no_math_data$testscr <- NULL
@@ -114,10 +109,8 @@ for (x in 1:size) {
     no_math_data$bullshit = no_math_data[,x] * no_math_data[,y]
     names(no_math_data)[names(no_math_data) == "bullshit"] <- new_name
     y = y + 1
-    #print(head(no_math_data, n=1L))
   }
 }
-head(no_math_data)
 no_math_data$read_scr <- TestData$read_scr
 
 
@@ -138,15 +131,104 @@ LinReg_all_512 <- regsubsets(
   method=c("exhaustive"))
 
 
+<<<<<<< HEAD
 #Best with only squared terms -- BIC = 1240.612
 LinReg_Best_Squared <- lm(read_scr ~ meal_pct + `expn_stu * expn_stu` + avginc + el_pct , data=no_math_data)
 
 #Best Model (I think) -- BIC = 1239.756
 lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+=======
+
+#Best Model -- BIC = 1239.756
+lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data) 
+>>>>>>> ac25b14bef40930762c92a7f9086e502ab551d2a
 
 
-#Best with all interactions, but nvmax = 512 -- BIC = 1239.756
+#Verifies NVMAX16, but nvmax = 512 -- BIC = 1239.756
 LinReg_all_512 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+
+
+####### JB Test #######
+
+resid_lm <- LinReg_all_512$residuals
+jarque.bera.test(resid_lm)
+#Yes, so use LAD
+
+#Enhanced Scatter Plot
+scatterplot(no_math_data$str,no_math_data$read_scr,
+            main="Enhanced Scatter Plot",
+            xlab="Student to Teach Ratio",
+            ylab="STudent Test Score",
+            sub="   ",
+            legend=TRUE)
+
+#Scatterplot the residuals
+plot(resid_lm, main = "Residual Plot from Best Regression",
+     xlab = "Fitted Y Values", 
+     ylab = "Deviation")
+
+
+
+#Residuals Plot of the linear model:
+Fitted_Residuals_Linear_Model<-lmNVMAX16$residuals;
+Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
+plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared,
+     main="Fitted Residuals of the Linear Model",
+     xlab="Student to Teach Ratio",
+     ylab="Residuals Squared",
+     sub="   ")
+
+#Residuals Plot of the linear model:
+Fitted_Residuals_Linear_Model<-LM_Reading_STR$residuals;
+Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
+plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared,
+     main="Fitted Residuals of the Best Fit Model",
+     xlab="Student to Teach Ratio",
+     ylab="Residuals Squared",
+     sub="   ")
+
+
+
+#LAD with all interactions, but nvmax = 512 -- BIC = 1245.196
+LAD_LinReg_all_512 <- lad(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+BIC(LAD_LinReg_all_512)
+resid_lm <- LAD_LinReg_all_512$residuals
+jarque.bera.test(resid_lm)
+#Still yes
+
+#Scatterplot the LAD residuals
+plot(resid_lm, main = "Residual Plot from Best Regression LAD",
+     xlab = "fitted Y values", 
+     ylab = "Deviation")
+
+###### Detecting Heteroskadicity #####
+#BP Test
+bptest(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+#We reject the Null at the 15.12% significance level
+
+resid_lm_sqrd = resid_lm * resid_lm
+
+#White Regression
+whiteTerms <-TestData
+whiteTerms$math_scr <- NULL
+whiteTerms$testscr <- NULL
+whiteTerms$X <- NULL
+whiteTerms$X.1 <- NULL
+whiteTerms$read_scr <- NULL
+whiteRegressors <- as.matrix(whiteTerms)
+whiteRegressors
+poly(whiteRegressors, degree = 2, raw = TRUE)
+whiteRegression <- lm(resid_lm_sqrd ~ poly(whiteRegressors, degree = 2, raw = TRUE))
+
+# Test the null of no relationship: use N*R_squared
+whiteStat <- nrow(whiteRegressors)*summary(whiteRegression)$r.squared
+quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
+Reject <- (whiteStat > quantile)
+print(Reject)
+#We do reject the Null at the 5% significance Level
+
+
+
 
 ############################################ OUTPUTS #########################################################
 
@@ -256,6 +338,7 @@ write.csv(as.data.frame(
 #  file = "Variables In-or-Out Table NVMAX 512.csv")
 
 
+<<<<<<< HEAD
 ####### JB Test #######
 
 resid_lm <- LinReg_all_512$residuals
@@ -305,6 +388,8 @@ Reject <- (whiteStat > quantile)
 print(Reject)
 #We do reject the Null at the 5% significance Level
 
+=======
+>>>>>>> ac25b14bef40930762c92a7f9086e502ab551d2a
 
 ################################################################################
 ############################ MATH REGRESSIONS ##################################
