@@ -80,11 +80,11 @@ LinReg_all_512 <- regsubsets(
 
 
 
-#Best Model (I think) -- BIC = 1239.756
+#Best Model -- BIC = 1239.756
 lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data) 
 
 
-#Best with all interactions, but nvmax = 512 -- BIC = 1239.756
+#Verifies NVMAX16, but nvmax = 512 -- BIC = 1239.756
 LinReg_all_512 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 
 
@@ -104,7 +104,7 @@ scatterplot(no_math_data$str,no_math_data$read_scr,
 
 #Scatterplot the residuals
 plot(resid_lm, main = "Residual Plot from Best Regression",
-     xlab = "fitted Y values", 
+     xlab = "Fitted Y Values", 
      ylab = "Deviation")
 
 
