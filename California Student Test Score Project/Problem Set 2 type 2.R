@@ -81,6 +81,27 @@ lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str
 LinReg_Best_128 <- lm(read_scr ~ `meal_pct * str` + `str * el_pct` + expn_stu + el_pct , data=no_math_data)
 
 
+
+#Residuals Plots 
+#The linear model:
+Fitted_Residuals_Linear_Model<-LM_Reading_STR$residuals;
+Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
+plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared, 
+     main="Fitted Residuals of the Linear Model",
+     xlab="Student to Teach Ratio",
+     ylab="Residuals Squared",
+     sub="   ")
+
+#Testing the "Best" model:
+Fitted_Residuals_Linear_Model<-lmNVMAX16$residuals;
+Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
+plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared, 
+     main="Fitted Residuals of the Linear Model",
+     xlab="Student to Teach Ratio",
+     ylab="Residuals Squared",
+     sub="   ")
+
+
 ############################################ OUTPUTS #########################################################
 
 
