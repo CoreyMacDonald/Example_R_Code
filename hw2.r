@@ -87,6 +87,89 @@ lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str
 #Best with all interactions, but nvmax = 512 -- BIC = 1239.756
 LinReg_all_512 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 
+
+####### JB Test #######
+
+resid_lm <- LinReg_all_512$residuals
+jarque.bera.test(resid_lm)
+#Yes, so use LAD
+
+#Enhanced Scatter Plot
+scatterplot(no_math_data$str,no_math_data$read_scr,
+            main="Enhanced Scatter Plot",
+            xlab="Student to Teach Ratio",
+            ylab="STudent Test Score",
+            sub="   ",
+            legend=TRUE)
+
+#Scatterplot the residuals
+plot(resid_lm, main = "Residual Plot from Best Regression",
+     xlab = "fitted Y values", 
+     ylab = "Deviation")
+
+
+
+#Residuals Plot of the linear model:
+Fitted_Residuals_Linear_Model<-lmNVMAX16$residuals;
+Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
+plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared,
+     main="Fitted Residuals of the Linear Model",
+     xlab="Student to Teach Ratio",
+     ylab="Residuals Squared",
+     sub="   ")
+
+#Residuals Plot of the linear model:
+Fitted_Residuals_Linear_Model<-LM_Reading_STR$residuals;
+Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
+plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared,
+     main="Fitted Residuals of the Best Fit Model",
+     xlab="Student to Teach Ratio",
+     ylab="Residuals Squared",
+     sub="   ")
+
+
+
+#LAD with all interactions, but nvmax = 512 -- BIC = 1245.196
+LAD_LinReg_all_512 <- lad(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+BIC(LAD_LinReg_all_512)
+resid_lm <- LAD_LinReg_all_512$residuals
+jarque.bera.test(resid_lm)
+#Still yes
+
+#Scatterplot the LAD residuals
+plot(resid_lm, main = "Residual Plot from Best Regression LAD",
+     xlab = "fitted Y values", 
+     ylab = "Deviation")
+
+###### Detecting Heteroskadicity #####
+#BP Test
+bptest(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+#We reject the Null at the 15.12% significance level
+
+resid_lm_sqrd = resid_lm * resid_lm
+
+#White Regression
+whiteTerms <-TestData
+whiteTerms$math_scr <- NULL
+whiteTerms$testscr <- NULL
+whiteTerms$X <- NULL
+whiteTerms$X.1 <- NULL
+whiteTerms$read_scr <- NULL
+whiteRegressors <- as.matrix(whiteTerms)
+whiteRegressors
+poly(whiteRegressors, degree = 2, raw = TRUE)
+whiteRegression <- lm(resid_lm_sqrd ~ poly(whiteRegressors, degree = 2, raw = TRUE))
+
+# Test the null of no relationship: use N*R_squared
+whiteStat <- nrow(whiteRegressors)*summary(whiteRegression)$r.squared
+quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
+Reject <- (whiteStat > quantile)
+print(Reject)
+#We do reject the Null at the 5% significance Level
+
+
+
+
 ############################################ OUTPUTS #########################################################
 
 
@@ -194,84 +277,5 @@ write.csv(as.data.frame(
 #  summary(LinReg_all_512)$outmat),
 #  file = "Variables In-or-Out Table NVMAX 512.csv")
 
-
-####### JB Test #######
-
-resid_lm <- LinReg_all_512$residuals
-jarque.bera.test(resid_lm)
-#Yes, so use LAD
-
-#Enhanced Scatter Plot
-scatterplot(no_math_data$str,no_math_data$read_scr,
-            main="Enhanced Scatter Plot",
-            xlab="Student to Teach Ratio",
-            ylab="STudent Test Score",
-            sub="   ",
-            legend=TRUE)
-
-#Scatterplot the residuals
-plot(resid_lm, main = "Residual Plot from Best Regression",
-     xlab = "fitted Y values", 
-     ylab = "Deviation")
-
-
-
-#Residuals Plot of the linear model:
-Fitted_Residuals_Linear_Model<-lmNVMAX16$residuals;
-Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
-plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared,
-     main="Fitted Residuals of the Linear Model",
-     xlab="Student to Teach Ratio",
-     ylab="Residuals Squared",
-     sub="   ")
-
-#Residuals Plot of the linear model:
-Fitted_Residuals_Linear_Model<-LM_Reading_STR$residuals;
-Fitted_Residuals_Linear_Model_Squared<-(Fitted_Residuals_Linear_Model)^2;
-plot(no_math_data$str, Fitted_Residuals_Linear_Model_Squared,
-     main="Fitted Residuals of the Best Fit Model",
-     xlab="Student to Teach Ratio",
-     ylab="Residuals Squared",
-     sub="   ")
-
-
-
-#LAD with all interactions, but nvmax = 512 -- BIC = 1245.196
-LAD_LinReg_all_512 <- lad(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
-BIC(LAD_LinReg_all_512)
-resid_lm <- LAD_LinReg_all_512$residuals
-jarque.bera.test(resid_lm)
-#Still yes
-
-#Scatterplot the LAD residuals
-plot(resid_lm, main = "Residual Plot from Best Regression LAD",
-     xlab = "fitted Y values", 
-     ylab = "Deviation")
-
-###### Detecting Heteroskadicity #####
-#BP Test
-bptest(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
-#We reject the Null at the 15.12% significance level
-
-resid_lm_sqrd = resid_lm * resid_lm
-
-#White Regression
-whiteTerms <-TestData
-whiteTerms$math_scr <- NULL
-whiteTerms$testscr <- NULL
-whiteTerms$X <- NULL
-whiteTerms$X.1 <- NULL
-whiteTerms$read_scr <- NULL
-whiteRegressors <- as.matrix(whiteTerms)
-whiteRegressors
-poly(whiteRegressors, degree = 2, raw = TRUE)
-whiteRegression <- lm(resid_lm_sqrd ~ poly(whiteRegressors, degree = 2, raw = TRUE))
-
-# Test the null of no relationship: use N*R_squared
-whiteStat <- nrow(whiteRegressors)*summary(whiteRegression)$r.squared
-quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
-Reject <- (whiteStat > quantile)
-print(Reject)
-#We do reject the Null at the 5% significance Level
 
 
