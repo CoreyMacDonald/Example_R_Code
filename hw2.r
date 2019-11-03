@@ -439,7 +439,7 @@ which.min(summary(NonLinReg_all_16)$bic)
 #Best Non-linear Model (I think) -- BIC = 1245.453
 nlmNVMAX16 <- lm(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
 BIC(nlmNVMAX16)
-<<<<<<< HEAD
+
 
 ####### JB Test #######
 
@@ -490,5 +490,23 @@ quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
 Reject <- (whiteStat > quantile)
 print(Reject)
 #We do reject the Null at the 5% significance Level
-=======
->>>>>>> bd80ee244da18510fd87b4b89a6414483cea94f2
+
+
+################################################################################
+############################ IV Predictions   ##################################
+################################################################################
+
+#Need to use the simple model that predicts on only str. (Modlm)
+Modlm <- lm(read_scr~str, data= no_math_data)
+#Point Prediciton
+#Predicts a point of 83.392
+point_prediction <- predict(Modlm, newdata = data.frame(str = c(15)))
+
+#Confidence Interval
+#Predicts [82.771, 84.012] centered on 83.392
+confidence_interval_prediction <- predict(Modlm, newdata = data.frame(str = c(15)), interval = "confidence")
+
+#Density Prediction
+var(Modlm$fitted.values - TestData$read_scr)
+#Variance is 5.934
+#Density Prediction is N(83.392, 5.934)
