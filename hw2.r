@@ -39,7 +39,6 @@ summary(Modlm)
 lm_onIntersept <- lm(read_scr~1, data = no_math_data)
 
 #regression without intercept
-<<<<<<< HEAD
 regression_without_intercept <- lm(Test_Score~Ratio- 1)
 
 #Loess Model (Not Used)
@@ -89,9 +88,6 @@ ScatterPlot +
 
 
 TestData<-read.csv("CATestScoreData.csv",header=TRUE)
-=======
-regression_without_intercept <- lm(read_scr~str- 1, data = no_math_data)
->>>>>>> ac25b14bef40930762c92a7f9086e502ab551d2a
 
 #Creates needed Dataset
 no_math_data <-TestData
@@ -131,18 +127,8 @@ LinReg_all_512 <- regsubsets(
   method=c("exhaustive"))
 
 
-<<<<<<< HEAD
-#Best with only squared terms -- BIC = 1240.612
-LinReg_Best_Squared <- lm(read_scr ~ meal_pct + `expn_stu * expn_stu` + avginc + el_pct , data=no_math_data)
-
-#Best Model (I think) -- BIC = 1239.756
-lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
-=======
-
 #Best Model -- BIC = 1239.756
-lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data) 
->>>>>>> ac25b14bef40930762c92a7f9086e502ab551d2a
-
+lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 
 #Verifies NVMAX16, but nvmax = 512 -- BIC = 1239.756
 LinReg_all_512 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
@@ -164,7 +150,7 @@ scatterplot(no_math_data$str,no_math_data$read_scr,
 
 #Scatterplot the residuals
 plot(resid_lm, main = "Residual Plot from Best Regression",
-     xlab = "Fitted Y Values", 
+     xlab = "Fitted Y Values",
      ylab = "Deviation")
 
 
@@ -198,7 +184,7 @@ jarque.bera.test(resid_lm)
 
 #Scatterplot the LAD residuals
 plot(resid_lm, main = "Residual Plot from Best Regression LAD",
-     xlab = "fitted Y values", 
+     xlab = "fitted Y values",
      ylab = "Deviation")
 
 ###### Detecting Heteroskadicity #####
@@ -338,7 +324,6 @@ write.csv(as.data.frame(
 #  file = "Variables In-or-Out Table NVMAX 512.csv")
 
 
-<<<<<<< HEAD
 ####### JB Test #######
 
 resid_lm <- LinReg_all_512$residuals
@@ -367,6 +352,7 @@ plot(resid_lm, main = "Residual Plot from Best Regression LAD",
 bptest(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 #We reject the Null at the 15.12% significance level
 
+resid_lm <- nlmNVMAX16$residuals
 resid_lm_sqrd = resid_lm * resid_lm
 
 #White Regression
@@ -388,8 +374,6 @@ Reject <- (whiteStat > quantile)
 print(Reject)
 #We do reject the Null at the 5% significance Level
 
-=======
->>>>>>> ac25b14bef40930762c92a7f9086e502ab551d2a
 
 ################################################################################
 ############################ MATH REGRESSIONS ##################################
@@ -457,3 +441,53 @@ which.min(summary(NonLinReg_all_16)$bic)
 #Best Non-linear Model (I think) -- BIC = 1245.453
 nlmNVMAX16 <- lm(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
 BIC(nlmNVMAX16)
+
+####### JB Test #######
+
+resid_lm <- nlmNVMAX16$residuals
+jarque.bera.test(resid_lm)
+#Yes, so use LAD
+
+#Scatterplot the residuals
+plot(resid_lm, main = "Residual Plot from Best Regression",
+     xlab = "fitted Y values",
+     ylab = "Deviation")
+
+#LAD with all interactions, but nvmax = 16 -- BIC = 1245.196
+LAD_lmNVMAX16 <- lad(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
+BIC(LAD_lmNVMAX16)
+resid_lm <- LAD_lmNVMAX16$residuals
+jarque.bera.test(resid_lm)
+#Still yes
+
+#Scatterplot the LAD residuals
+plot(resid_lm, main = "Residual Plot from Best Regression LAD",
+     xlab = "fitted Y values",
+     ylab = "Deviation")
+
+###### Detecting Heteroskadicity #####
+#BP Test
+bptest(read_scr~ meal_pct + avginc + el_pct, data=no_math_data)
+#We reject the Null at the 11.04% significance level
+
+resid_lm <- nlmNVMAX16$residuals
+resid_lm_sqrd = resid_lm * resid_lm
+
+#White Regression
+whiteTerms <-TestData
+whiteTerms$math_scr <- NULL
+whiteTerms$testscr <- NULL
+whiteTerms$X <- NULL
+whiteTerms$X.1 <- NULL
+whiteTerms$read_scr <- NULL
+whiteRegressors <- as.matrix(whiteTerms)
+whiteRegressors
+poly(whiteRegressors, degree = 2, raw = TRUE)
+whiteRegression <- lm(resid_lm_sqrd ~ poly(whiteRegressors, degree = 2, raw = TRUE))
+
+# Test the null of no relationship: use N*R_squared
+whiteStat <- nrow(whiteRegressors)*summary(whiteRegression)$r.squared
+quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
+Reject <- (whiteStat > quantile)
+print(Reject)
+#We do reject the Null at the 5% significance Level
