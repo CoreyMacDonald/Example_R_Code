@@ -415,7 +415,7 @@ plot(resid_lm, main = "Residual Plot from Best Regression LAD",
      ylab = "Deviation")
 
 ###### Detecting Heteroskadicity #####
-#BP Test
+#BP Test - Use the Best Linear Model
 bptest(read_scr~ meal_pct + avginc + el_pct, data=no_math_data)
 #We reject the Null at the 11.04% significance level
 
@@ -452,14 +452,29 @@ Modlm <- lm(read_scr~str, data= no_math_data)
 #Predicts a point of 83.392
 point_prediction <- predict(Modlm, newdata = data.frame(str = c(15)))
 
-#Confidence Interval
-#Predicts [82.771, 84.012] centered on 83.392
+#Confidence Interval - Heteroskedastic and Non-Normal Data
+#Create a regression to predict the residuals
+resid_lm <- Modlm$residuals
+resid_lm_sqrd = resid_lm * resid_lm
+residual_regression = lm(resid_lm_sqrd ~ str, data = no_math_data)
+summary(residual_regression)
+
+
+#Predict the residual for this specific str - prediction = 2.751
+residual_prediction <- predict(residual_regression, newdata = data.frame(str = c(15)))
+sqrt(residual_prediction)
+
+#Predicts [82.771, 84.012] centered on 83.392 using the built in confidence interval method
 confidence_interval_prediction <- predict(Modlm, newdata = data.frame(str = c(15)), interval = "confidence")
 
-#Density Prediction
+#Predict 83.392 +/- 2.751 when using the regrssors to predict the residual
+
+#Density Prediction - Heteroskedastic and Non-Normal Data
 var(Modlm$fitted.values - TestData$read_scr)
 #Variance is 5.934
-#Density Prediction is N(83.392, 5.934)
+#Density Prediction is N(83.392, 5.934) -- ONLY IF NORMAL AND HOMOSKEDASTIC
+
+#Density Prediction is N(83.392, 7.568) when using the regrssors to predict the residual
 
 ################################################################################
 ############################  V Predictions   ##################################
@@ -468,21 +483,36 @@ var(Modlm$fitted.values - TestData$read_scr)
 #We now have all data points, so we can use out best model
 lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 
-#Make the new data
+#Make the new data 
 new = data.frame(el_pct = c(.5))
 new$`str * el_pct` = c(15 * .5)
 new$`expn_stu * avginc` = c(mean(TestData$expn_stu) * 7)
 new$`meal_pct * str` = c(.6 * 15)
 
-#Point Prediciton
+#Point Prediciton 
 #Predicts a point of 84.131
 point_prediction <- predict(lmNVMAX16, newdata = new)
 
-#Confidence Interval
-#Predicts [83.8112, 84.450] centered on 84.131
+#Confidence Interval - Heteroskedastic and Non-Normal Data, so how to do this?
+#Create a regression to predict the residuals
+resid_lm <- lmNVMAX16$residuals
+resid_lm_sqrd = resid_lm * resid_lm
+residual_regression = lm(resid_lm_sqrd ~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+summary(residual_regression)
+
+
+#Predict the residual for this specific str - prediction = 1.051
+residual_prediction <- predict(residual_regression, newdata = new)
+sqrt(residual_prediction)
+
+#Predicts [83.8112, 84.450] centered on 84.131 using the built in confidence interval method
 confidence_interval_prediction <- predict(lmNVMAX16, newdata = new, interval = "confidence")
 
-#Density Prediction
+#Predict 84.131 +/- 1.051 when using the regrssors to predict the residual
+
+#Density Prediction - Heteroskedastic and Non-Normal Data, so how to do this?
 var(lmNVMAX16$fitted.values - TestData$read_scr)
 #Variance is 1.031
-#Density Prediction is N(84.131, 1.031)
+#Density Prediction is N(84.131, 1.031) -- ONLY IF NORMAL AND HOMOSKEDASTIC
+
+#Density Prediction is N(84.131,  1.054) when using the regrssors to predict the residual
