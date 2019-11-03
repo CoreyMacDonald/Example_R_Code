@@ -465,4 +465,24 @@ var(Modlm$fitted.values - TestData$read_scr)
 ############################  V Predictions   ##################################
 ################################################################################
 
-#We now have all data points, so we can use out best model, 
+#We now have all data points, so we can use out best model
+lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
+
+#Make the new data
+new = data.frame(el_pct = c(.5))
+new$`str * el_pct` = c(15 * .5)
+new$`expn_stu * avginc` = c(mean(TestData$expn_stu) * 7)
+new$`meal_pct * str` = c(.6 * 15)
+
+#Point Prediciton
+#Predicts a point of 84.131
+point_prediction <- predict(lmNVMAX16, newdata = new)
+
+#Confidence Interval
+#Predicts [83.8112, 84.450] centered on 84.131
+confidence_interval_prediction <- predict(lmNVMAX16, newdata = new, interval = "confidence")
+
+#Density Prediction
+var(lmNVMAX16$fitted.values - TestData$read_scr)
+#Variance is 1.031
+#Density Prediction is N(84.131, 1.031)
