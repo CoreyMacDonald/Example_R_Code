@@ -41,8 +41,6 @@ lm_onIntersept <- lm(read_scr~1, data = no_math_data)
 #regression without intercept
 regression_without_intercept <- lm(Test_Score~Ratio- 1)
 
-#Loess Model (Not Used)
-Modloess <- loess(Ratio~Test_Score)
 
 
 #### End Initialize Globals####
@@ -441,6 +439,7 @@ which.min(summary(NonLinReg_all_16)$bic)
 #Best Non-linear Model (I think) -- BIC = 1245.453
 nlmNVMAX16 <- lm(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
 BIC(nlmNVMAX16)
+<<<<<<< HEAD
 
 ####### JB Test #######
 
@@ -491,3 +490,5 @@ quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
 Reject <- (whiteStat > quantile)
 print(Reject)
 #We do reject the Null at the 5% significance Level
+=======
+>>>>>>> bd80ee244da18510fd87b4b89a6414483cea94f2
