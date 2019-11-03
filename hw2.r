@@ -473,8 +473,8 @@ confidence_interval_prediction <- predict(Modlm, newdata = data.frame(str = c(15
 var(Modlm$fitted.values - TestData$read_scr)
 #Variance is 5.934
 #Density Prediction is N(83.392, 5.934) -- ONLY IF NORMAL AND HOMOSKEDASTIC
-
-#Density Prediction is N(83.392, 7.568) when using the regrssors to predict the residual
+ 
+#Density Prediction is N(83.392, 7.568) when using the regrssors to predict the residual STILL ASSUMES NORMAL, SO WRONG
 
 ################################################################################
 ############################  V Predictions   ##################################
@@ -515,4 +515,4 @@ var(lmNVMAX16$fitted.values - TestData$read_scr)
 #Variance is 1.031
 #Density Prediction is N(84.131, 1.031) -- ONLY IF NORMAL AND HOMOSKEDASTIC
 
-#Density Prediction is N(84.131,  1.054) when using the regrssors to predict the residual
+#Density Prediction is N(84.131,  1.054) when using the regrssors to predict the residual STILL ASSUMES NORMAL, SO WRONG
