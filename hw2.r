@@ -42,8 +42,6 @@ lm_onIntersept <- lm(read_scr~1, data = no_math_data)
 <<<<<<< HEAD
 regression_without_intercept <- lm(Test_Score~Ratio- 1)
 
-#Loess Model (Not Used)
-Modloess <- loess(Ratio~Test_Score)
 
 
 #### End Initialize Globals####
