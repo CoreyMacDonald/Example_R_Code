@@ -208,7 +208,7 @@ whiteStat <- nrow(whiteRegressors)*summary(whiteRegression)$r.squared
 quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
 Reject <- (whiteStat > quantile)
 print(Reject)
-#We do reject the Null at the 5% significance Level
+#We fail to reject the Null at the 5% significance Level
 
 
 
@@ -374,7 +374,7 @@ BIC(nlmNVMAX16)
 
 resid_lm <- nlmNVMAX16$residuals
 jarque.bera.test(resid_lm)
-#p-value of .445, so at under the 44.5% significance level. Therefore, no LAD and Normal
+#p-value of .445, so at under the 44.5% significance level. So we fail to reject at 5% sig level. Therefore, no LAD and Normal
 
 #Scatterplot the residuals
 plot(resid_lm, main = "Residual Plot from Best Regression",
@@ -431,29 +431,26 @@ Modlm <- lm(read_scr~str, data= no_math_data)
 #Predicts a point of 83.392
 point_prediction <- predict(Modlm, newdata = data.frame(str = c(15)))
 
-#Confidence Interval - Heteroskedastic and Non-Normal Data
-#Create a regression to predict the residuals
-resid_lm <- Modlm$residuals
-resid_lm_sqrd = resid_lm * resid_lm
-residual_regression = lm(resid_lm_sqrd ~ str, data = no_math_data)
-summary(residual_regression)
+#Confidence Interval - Homoskedastic and Non-Normal Data
+Resid <- Modlm$residuals
+
+BootStrapDraws <- sample(Resid, 1000, replace = TRUE)
+
+BootstrapForecast <- point_prediction + BootStrapDraws
 
 
-#Predict the residual for this specific str - prediction = 2.751
-residual_prediction <- predict(residual_regression, newdata = data.frame(str = c(15)))
-sqrt(residual_prediction)
+#Forming the interval forecast
+lowerbound<-quantile(BootstrapForecast,probs=0.025)
+upperbound<-quantile(BootstrapForecast,probs=0.975)
+print(lowerbound)
+print(upperbound)
 
-#Predicts [82.771, 84.012] centered on 83.392 using the built in confidence interval method
-confidence_interval_prediction <- predict(Modlm, newdata = data.frame(str = c(15)), interval = "confidence")
+#Predicts [78.639, 87.949] centered on 83.392 using bootstrapping
 
-#Predict 83.392 +/- 2.751 when using the regrssors to predict the residual
+#Density Prediction - Homoskedastic and Non-Normal Data -- Need to do bootstrapping
+DensityForecast_Bootstrap <- density(BootstrapForecast)
+plot(DensityForecast_Bootstrap, main = "Density", xlab="wage")
 
-#Density Prediction - Heteroskedastic and Non-Normal Data
-var(Modlm$fitted.values - TestData$read_scr)
-#Variance is 5.934
-#Density Prediction is N(83.392, 5.934) -- ONLY IF NORMAL AND HOMOSKEDASTIC
- 
-#Density Prediction is N(83.392, 7.568) when using the regrssors to predict the residual STILL ASSUMES NORMAL, SO WRONG
 
 ################################################################################
 ############################  V Predictions   ##################################
@@ -472,26 +469,23 @@ new$`meal_pct * str` = c(.6 * 15)
 #Predicts a point of 84.131
 point_prediction <- predict(lmNVMAX16, newdata = new)
 
-#Confidence Interval - Heteroskedastic and Non-Normal Data, so how to do this?
-#Create a regression to predict the residuals
-resid_lm <- lmNVMAX16$residuals
-resid_lm_sqrd = resid_lm * resid_lm
-residual_regression = lm(resid_lm_sqrd ~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
-summary(residual_regression)
+#Confidence Interval - Homoskedastic and Non-Normal Data
+Resid <- lmNVMAX16$residuals
+BootStrapDraws <- sample(Resid, 1000, replace = TRUE)
+
+BootstrapForecast <- point_prediction + BootStrapDraws
 
 
-#Predict the residual for this specific str - prediction = 1.051
-residual_prediction <- predict(residual_regression, newdata = new)
-sqrt(residual_prediction)
+#Forming the interval forecast
+lowerbound<-quantile(BootstrapForecast,probs=0.025)
+upperbound<-quantile(BootstrapForecast,probs=0.975)
+print(lowerbound)
+print(upperbound)
 
-#Predicts [83.8112, 84.450] centered on 84.131 using the built in confidence interval method
-confidence_interval_prediction <- predict(lmNVMAX16, newdata = new, interval = "confidence")
 
-#Predict 84.131 +/- 1.051 when using the regrssors to predict the residual
+#Predicts [82.291, 86.291] centered on 84.131 using bootstrapping
+
 
 #Density Prediction - Heteroskedastic and Non-Normal Data, so how to do this?
-var(lmNVMAX16$fitted.values - TestData$read_scr)
-#Variance is 1.031
-#Density Prediction is N(84.131, 1.031) -- ONLY IF NORMAL AND HOMOSKEDASTIC
-
-#Density Prediction is N(84.131,  1.054) when using the regrssors to predict the residual STILL ASSUMES NORMAL, SO WRONG
+DensityForecast_Bootstrap <- density(BootstrapForecast)
+plot(DensityForecast_Bootstrap, main = "Density", xlab="wage")
