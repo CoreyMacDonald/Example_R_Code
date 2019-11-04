@@ -188,17 +188,16 @@ plot(resid_lm, main = "Residual Plot from Best Regression LAD",
 ###### Detecting Heteroskadicity #####
 #BP Test
 bptest(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
-#We reject the Null at the 15.12% significance level
+#We reject the Null at the 15.12% significance level, so fail to reject at 5% sig level
 
 resid_lm_sqrd = resid_lm * resid_lm
 
 #White Regression
-whiteTerms <-TestData
-whiteTerms$math_scr <- NULL
-whiteTerms$testscr <- NULL
-whiteTerms$X <- NULL
-whiteTerms$X.1 <- NULL
-whiteTerms$read_scr <- NULL
+whiteTerms <-data.frame(el_pct = no_math_data$el_pct)
+whiteTerms$`expn_stu * avginc` <- no_math_data$`expn_stu * avginc`
+whiteTerms$`str * el_pct` <- no_math_data$`str * el_pct`
+whiteTerms$`meal_pct * str` <- no_math_data$`meal_pct * str`
+whiteTerms
 whiteRegressors <- as.matrix(whiteTerms)
 whiteRegressors
 poly(whiteRegressors, degree = 2, raw = TRUE)
@@ -335,26 +334,6 @@ basic_model <- lm(math_scr~Test_Score, data = TestData)
 summary(basic_model)
 
 
-#Finding the best linear Model
-no_read_data <-TestData
-no_read_data$testscr <- NULL
-no_read_data$X <- NULL
-no_read_data$X.1 <- NULL
-no_read_data$read_scr <- NULL
-size = ncol(no_read_data)
-
-#NVMAX = 16
-LinReg_all_16 <- regsubsets(
-  math_scr ~ ., data = no_read_data,
-  nvmax = 16, really.big= TRUE ,
-  method=c("exhaustive"))
-
-summary(LinReg_all_16)
-which.min(summary(LinReg_all_16)$bic)
-#Best Linear Model (I think) -- BIC = 1401.307
-lmNVMAX16 <- lm(math_scr~ meal_pct + avginc + el_pct, data=no_read_data)
-BIC(lmNVMAX16)
-
 #Finding best non-linear model
 no_read_data <-TestData
 no_read_data$math_scr <- NULL
@@ -395,40 +374,40 @@ BIC(nlmNVMAX16)
 
 resid_lm <- nlmNVMAX16$residuals
 jarque.bera.test(resid_lm)
-#Yes, so use LAD
+#p-value of .445, so at under the 44.5% significance level. Therefore, no LAD and Normal
 
 #Scatterplot the residuals
 plot(resid_lm, main = "Residual Plot from Best Regression",
      xlab = "fitted Y values",
      ylab = "Deviation")
 
-#LAD with all interactions, but nvmax = 16 -- BIC = 1253.993
-LAD_lmNVMAX16 <- lad(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
-BIC(LAD_lmNVMAX16)
-resid_lm <- LAD_lmNVMAX16$residuals
-jarque.bera.test(resid_lm)
-#Still yes
+#LAD with all interactions, but nvmax = 16 -- BIC = 1424.663
+#LAD_lmNVMAX16 <- lad(math_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_read_data)
+#BIC(LAD_lmNVMAX16)
+#resid_lm <- LAD_lmNVMAX16$residuals
+#jarque.bera.test(resid_lm)
+
 
 #Scatterplot the LAD residuals
-plot(resid_lm, main = "Residual Plot from Best Regression LAD",
-     xlab = "fitted Y values",
-     ylab = "Deviation")
+#plot(resid_lm, main = "Residual Plot from Best Regression LAD",
+#     xlab = "fitted Y values",
+#     ylab = "Deviation")
 
 ###### Detecting Heteroskadicity #####
-#BP Test - Use the Best Linear Model
-bptest(read_scr~ meal_pct + avginc + el_pct, data=no_math_data)
-#We reject the Null at the 11.04% significance level
+#BP Test - Use the Best Model
+bptest(math_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_read_data)
+#We reject the Null at the 3.854% significance level
 
 resid_lm <- nlmNVMAX16$residuals
 resid_lm_sqrd = resid_lm * resid_lm
 
-#White Regression
-whiteTerms <-TestData
-whiteTerms$math_scr <- NULL
-whiteTerms$testscr <- NULL
-whiteTerms$X <- NULL
-whiteTerms$X.1 <- NULL
-whiteTerms$read_scr <- NULL
+#White Regression - Not necessary because our model already has non-linear terms, so not clear if White's is more
+#   informative than BP in this case.
+whiteTerms <-data.frame(meal_pct = no_read_data$meal_pct)
+whiteTerms$`expn_stu * avginc` <- no_read_data$`expn_stu * avginc`
+whiteTerms$`calw_pct * avginc` <- no_read_data$`calw_pct * avginc`
+whiteTerms$el_pct <- no_read_data$el_pct
+whiteTerms
 whiteRegressors <- as.matrix(whiteTerms)
 whiteRegressors
 poly(whiteRegressors, degree = 2, raw = TRUE)
