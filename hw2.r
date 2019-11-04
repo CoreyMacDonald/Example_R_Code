@@ -351,8 +351,8 @@ LinReg_all_16 <- regsubsets(
 
 summary(LinReg_all_16)
 which.min(summary(LinReg_all_16)$bic)
-#Best Linear Model (I think) -- BIC = 1258.1
-lmNVMAX16 <- lm(read_scr~ meal_pct + avginc + el_pct, data=no_math_data)
+#Best Linear Model (I think) -- BIC = 1401.307
+lmNVMAX16 <- lm(math_scr~ meal_pct + avginc + el_pct, data=no_read_data)
 BIC(lmNVMAX16)
 
 #Finding best non-linear model
@@ -386,8 +386,8 @@ NonLinReg_all_16 <- regsubsets(
 summary(NonLinReg_all_16)
 which.min(summary(NonLinReg_all_16)$bic)
 
-#Best Non-linear Model (I think) -- BIC = 1245.453
-nlmNVMAX16 <- lm(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
+#Best Non-linear Model (I think) -- BIC = 1395.554
+nlmNVMAX16 <- lm(math_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_read_data)
 BIC(nlmNVMAX16)
 
 
@@ -402,7 +402,7 @@ plot(resid_lm, main = "Residual Plot from Best Regression",
      xlab = "fitted Y values",
      ylab = "Deviation")
 
-#LAD with all interactions, but nvmax = 16 -- BIC = 1245.196
+#LAD with all interactions, but nvmax = 16 -- BIC = 1253.993
 LAD_lmNVMAX16 <- lad(read_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_math_data)
 BIC(LAD_lmNVMAX16)
 resid_lm <- LAD_lmNVMAX16$residuals
