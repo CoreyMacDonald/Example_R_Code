@@ -442,13 +442,13 @@ plot(DensityForecast_Bootstrap, main = "Density", xlab="wage")
 lmNVMAX16 <- lm(read_scr~ `str * el_pct` + `expn_stu * avginc` + `meal_pct * str` + el_pct, data=no_math_data)
 
 #Make the new data 
-new = data.frame(el_pct = c(.5))
-new$`str * el_pct` = c(15 * .5)
+new = data.frame(el_pct = c(50))
+new$`str * el_pct` = c(15 * 50)
 new$`expn_stu * avginc` = c(mean(TestData$expn_stu) * 7)
-new$`meal_pct * str` = c(.6 * 15)
+new$`meal_pct * str` = c(60 * 15)
 
 #Point Prediciton 
-#Predicts a point of 84.131
+#Predicts a point of 79.115
 point_prediction <- predict(lmNVMAX16, newdata = new)
 
 #Confidence Interval - Homoskedastic and Non-Normal Data
@@ -465,7 +465,7 @@ print(lowerbound)
 print(upperbound)
 
 
-#Predicts [82.291, 86.291] centered on 84.131 using bootstrapping
+#Predicts [77.218, 81.238] centered on 79.115 using bootstrapping
 
 
 #Density Prediction - Heteroskedastic and Non-Normal Data, so how to do this?
