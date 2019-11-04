@@ -362,7 +362,7 @@ LinReg_all_16 <- regsubsets(
 summary(LinReg_all_16)
 which.min(summary(LinReg_all_16)$bic)
 
-#Best Model (I think) -- BIC = 1395.554
+#Best Model -- BIC = 1395.554
 lmNVMAX16 <- lm(math_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_read_data)
 BIC(lmNVMAX16)
 
@@ -400,7 +400,7 @@ whiteStat <- nrow(whiteRegressors)*summary(whiteRegression)$r.squared
 quantile <- qchisq(.95,length(whiteRegression$coefficients)-1)
 Reject <- (whiteStat > quantile)
 print(Reject)
-#We do reject the Null at the 5% significance Level
+#We reject the Null at the 5% significance Level
 
 
 ################################################################################
