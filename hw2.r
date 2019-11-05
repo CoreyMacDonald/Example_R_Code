@@ -147,7 +147,7 @@ scatterplot(no_math_data$str,no_math_data$read_scr,
             legend=TRUE)
 
 #Scatterplot the residuals
-plot(resid_lm, main = "Residual Plot from Best Regression",
+plot(resid_lm, main = "Residual Plot from read_scr Best Regression",
      xlab = "Fitted Y Values",
      ylab = "Deviation")
 
@@ -181,7 +181,7 @@ jarque.bera.test(resid_lm)
 #Still yes
 
 #Scatterplot the LAD residuals
-plot(resid_lm, main = "Residual Plot from Best Regression LAD",
+plot(resid_lm, main = "Residual Plot from read_scr Best Regression LAD",
      xlab = "fitted Y values",
      ylab = "Deviation")
 
@@ -329,6 +329,7 @@ TestData<-read.csv("CATestScoreData.csv",header=TRUE)
 #Regression of math_scr on str
 basic_model <- lm(math_scr~str, data = TestData)
 summary(basic_model)
+BIC(basic_model)
 
 
 #Finding best model
@@ -365,7 +366,7 @@ which.min(summary(LinReg_all_16)$bic)
 #Best Model -- BIC = 1395.554
 lmNVMAX16 <- lm(math_scr~ `expn_stu * avginc` + `calw_pct * avginc` + meal_pct + el_pct, data=no_read_data)
 BIC(lmNVMAX16)
-
+summary(lmNVMAX16)
 
 ####### JB Test #######
 
@@ -374,7 +375,7 @@ jarque.bera.test(resid_lm)
 #p-value of .445, so at under the 44.5% significance level. So we fail to reject at 5% sig level. Therefore, no LAD and Normal
 
 #Scatterplot the residuals
-plot(resid_lm, main = "Residual Plot from Best Regression",
+plot(resid_lm, main = "Residual Plot from math_scr Best Regression",
      xlab = "fitted Y values",
      ylab = "Deviation")
 
@@ -431,7 +432,7 @@ print(upperbound)
 
 #Density Prediction - Homoskedastic and Non-Normal Data -- Need to do bootstrapping
 DensityForecast_Bootstrap <- density(BootstrapForecast)
-plot(DensityForecast_Bootstrap, main = "Density", xlab="wage")
+plot(DensityForecast_Bootstrap, main = "Density", xlab="read_scr")
 
 
 ################################################################################
@@ -470,4 +471,4 @@ print(upperbound)
 
 #Density Prediction - Heteroskedastic and Non-Normal Data, so how to do this?
 DensityForecast_Bootstrap <- density(BootstrapForecast)
-plot(DensityForecast_Bootstrap, main = "Density", xlab="wage")
+plot(DensityForecast_Bootstrap, main = "Density", xlab="read_scr")
